@@ -1169,11 +1169,23 @@ func (k *Kad) Snapshot() *topology.KadParams {
 
 	_ = k.connectedPeers.EachBin(func(addr swarm.Address, po uint8) (bool, bool, error) {
 		infos[po].BinConnected++
+		bzzAddr, err := k.addressBook.Get(addr)
+		var under string
+		switch {
+		case errors.Is(err, addressbook.ErrNotFound):
+			under = ""
+		case err != nil:
+			k.logger.Debugf("kademlia: failed to get address book entry for peer %q: %v", addr, err)
+			under = ""
+		default:
+			under = bzzAddr.Underlay.String()
+		}
 		infos[po].ConnectedPeers = append(
 			infos[po].ConnectedPeers,
 			&topology.PeerInfo{
 				Address: addr,
-				Metrics: createMetricsSnapshotView(ss[addr.ByteString()]),
+				Underlay: under,
+				Metrics: createMetricsSnapshotView(ss[addr.String()]),
 			},
 		)
 		return false, false, nil

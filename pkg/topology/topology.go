@@ -67,6 +67,7 @@ type EachPeerFunc func(swarm.Address, uint8) (stop, jumpToNext bool, err error)
 // PeerInfo is a view of peer information exposed to a user.
 type PeerInfo struct {
 	Address swarm.Address       `json:"address"`
+	Underlay string             `json:"underlay"`
 	Metrics *MetricSnapshotView `json:"metrics,omitempty"`
 }
 
